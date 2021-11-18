@@ -31,17 +31,23 @@ def find_post(id):
     for p in all_posts:
         if p["id"] == id:
             return p
-        # else:
-        #     return [{"msg": f"details with {id} Not found"}, {"statuscode": 404}]
+
+def delete_one_post(id):
+    for i, p in enumerate(all_posts):
+        if p['id'] == id:
+            return i
+
 
 @app.get("/")
 async def root():
     return {"message": "Hello World!!"}
 
+# Get all Posts
 @app.get("/posts")
 def get_posts():
     return {"data": all_posts}
 
+# Get one post with id
 @app.get("/posts/{id}")
 def get_post(id: int, response: Response):
     post = find_post(id)
@@ -51,6 +57,7 @@ def get_post(id: int, response: Response):
         # return {"message": f"Post with id: {id} was not found"}
     return {"post_details": post}
 
+# Create a post
 @app.post("/posts")
 # def create_posts(payload: dict = Body(...)):    
 # # return {"post":f"title {payload['title']} content: {payload['content']}"}
@@ -60,3 +67,12 @@ def create_posts(post: Createpostschema ):
     post_dict['id'] = randrange(0, 10000)
     all_posts.append(post_dict)
     return{"data": post_dict}
+
+# Delete a post
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int):
+   index = delete_one_post(id)
+   if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
+   all_posts.pop(index)
+   return Response(status_code=status.HTTP_204_NO_CONTENT)
