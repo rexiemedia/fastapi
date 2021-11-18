@@ -32,7 +32,7 @@ def find_post(id):
         if p["id"] == id:
             return p
 
-def delete_one_post(id):
+def find_post_index(id):
     for i, p in enumerate(all_posts):
         if p['id'] == id:
             return i
@@ -71,8 +71,20 @@ def create_posts(post: Createpostschema ):
 # Delete a post
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int):
-   index = delete_one_post(id)
+   index = find_post_index(id)
    if index == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
    all_posts.pop(index)
    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+# Update a post
+@app.put("/posts/{id}", status_code=status.HTTP_200_OK)
+def delete_post(id: int, post: Createpostschema):
+   index = find_post_index(id)
+   if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
+   post_dict = post.dict()
+   post_dict['id'] = id
+   all_posts[index] = post_dict
+
+   return {"data": post_dict}
