@@ -5,7 +5,9 @@ from fastapi.params import Body
 # importing basemodel to create a schema for incoming data
 from pydantic import BaseModel
 from random import randrange
-
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import time
 from starlette.responses import Response
 
 app = FastAPI()
@@ -13,9 +15,24 @@ app = FastAPI()
 class Createpostschema(BaseModel):
     title: str
     content: str
-    # optional field if not provided by client
     published: bool = True
-    rating: Optional[int] = None
+    # rating: Optional[int] = None
+
+try:
+    conn = psycopg2.connect(host='localhost', database='fastapi', user='postgres', password='!Alphaeagle123', cursor_factory=RealDictCursor)
+    cursor = conn.cursor()
+    if cursor.closed == True:
+        pass
+    else:
+        cursor = conn.cursor()
+        time.sleep(2)
+    print("connection successful")
+except Exception as error:
+    print("error connect")
+    print("Error:", error)
+   
+
+
 
 all_posts = [{
     "title": "fastapi 1",
@@ -45,7 +62,10 @@ async def root():
 # Get all Posts
 @app.get("/posts")
 def get_posts():
-    return {"data": all_posts}
+    cursor.execute("""SELECT * FROM posts """)
+    posts = cursor.fetchall()
+    return {"data": posts}
+    
 
 # Get one post with id
 @app.get("/posts/{id}")
