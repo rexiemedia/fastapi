@@ -1,6 +1,6 @@
 from types import new_class
 from typing import Optional
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body 
 
 # importing basemodel to create a schema for incoming data
@@ -10,8 +10,15 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
 from starlette.responses import Response
+from sqlalchemy.orm import Session
+from . import models
+from . database import engine, get_db
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
 
 class Createpostschema(BaseModel):
     title: str
@@ -52,12 +59,19 @@ def find_post_index(id):
 async def root():
     return {"message": "Hello World!!"}
 
+
+# SqlAlchemy test route
+@app.get("/sqlalchemy")
+async def get_sqlalchemy(db: Session = Depends(get_db)):
+    return {"message": db}
+
+
 # Get all Posts
 @app.get("/posts")
 def get_posts():
     cursor.execute("""SELECT * FROM posts """)
-    all_posts = cursor.fetchall()
-    return {"data": all_posts}
+    posts = cursor.fetchall()
+    return {"data": posts}
     
 
 # Get one post with id
