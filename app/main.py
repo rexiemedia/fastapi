@@ -1,33 +1,24 @@
-from types import new_class
-from typing import Optional
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body 
-
-# importing basemodel to create a schema for incoming data
-from pydantic import BaseModel
+from typing import List
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
 from starlette.responses import Response
 from sqlalchemy.orm import Session
-from . import models
+from . import models, schema
 from .database import engine, get_db
+
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-# Pydantic object schema
-class Createpostschema(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-    rating: Optional[int] = None
-
+# Using SQL queries
 try:
-    conn = psycopg2.connect(host='localhost', database='fastapi', user='postgres', password='!Alphaeagle123', cursor_factory=RealDictCursor)
+    conn = psycopg2.connect(host='localhost', database='fastapis', user='postgres', password='!Alphaeagle123', cursor_factory=RealDictCursor)
     cursor = conn.cursor()
     if cursor.closed == True:
         pass
@@ -39,8 +30,6 @@ except Exception as error:
     print("error connect")
     print("Error:", error)
    
-
-
 
 all_posts = []
 
@@ -62,31 +51,31 @@ async def root():
 
 # Using SqlAlchemy to perfom queries
 
-@app.get("/sqlalchemy")
+@app.get("/sqlalchemy", response_model=List[schema.Post])
 async def get_sqlalchemy(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
-    return {"data": posts}
+    return  posts
 
 
 # Create a post
-@app.post("/sqlalchemy", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Createpostschema, db: Session = Depends(get_db)):
+@app.post("/sqlalchemy", status_code=status.HTTP_201_CREATED, response_model=schema.Post)
+def create_posts(post: schema.PostCreate, db: Session = Depends(get_db)):
 # **post.dict() will unpack the model instead of doing post.title
    new_post =  models.Post(**post.dict())
 
    db.add(new_post)
    db.commit()
    db.refresh(new_post)
-   return{"data": new_post}
+   return new_post
 
 # Get one post with id
-@app.get("/sqlalchemy/{id}")
+@app.get("/sqlalchemy/{id}", response_model=schema.PostId)
 def get_post(id: int, db: Session= Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
 
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with id: {id} was not found")
-    return {"post_details": post}
+    return post
 
 
 # Delete a post
@@ -105,7 +94,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 # Update a post
 @app.put("/sqlalchemy/{id}", status_code=status.HTTP_201_CREATED)
-def update_post(id: int, update_post: Createpostschema,  db: Session = Depends(get_db)):
+def update_post(id: int, update_post: schema.PostCreate,  db: Session = Depends(get_db)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
@@ -118,7 +107,7 @@ def update_post(id: int, update_post: Createpostschema,  db: Session = Depends(g
     
     db.commit()
 
-    return {"data": post_query.first()}
+    return post_query.first()
 
 # SqlAlchemy ends here
 
@@ -149,7 +138,7 @@ def get_post(id: int, response: Response):
 
 # Create a post
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Createpostschema ):
+def create_posts(post: schema.PostCreate ):
     cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING * """, (post.title, post.content, post.published))
 
     new_post = cursor.fetchone()
@@ -170,7 +159,7 @@ def delete_post(id: int):
 
 # Update a post
 @app.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
-def update_post(id: int, post: Createpostschema):
+def update_post(id: int, post: schema.PostCreate):
 
     cursor.execute(""" UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""", (post.title, post.content, post.published, str(id)))
 
