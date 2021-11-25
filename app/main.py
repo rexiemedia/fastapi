@@ -19,7 +19,7 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
-
+# Pydantic object schema
 class Createpostschema(BaseModel):
     title: str
     content: str
@@ -60,12 +60,74 @@ async def root():
     return {"message": "Hello World!!"}
 
 
-# SqlAlchemy test route
+# Using SqlAlchemy to perfom queries
+
 @app.get("/sqlalchemy")
 async def get_sqlalchemy(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     return {"data": posts}
 
+
+# Create a post
+@app.post("/sqlalchemy", status_code=status.HTTP_201_CREATED)
+def create_posts(post: Createpostschema, db: Session = Depends(get_db)):
+# **post.dict() will unpack the model instead of doing post.title
+   new_post =  models.Post(**post.dict())
+
+   db.add(new_post)
+   db.commit()
+   db.refresh(new_post)
+   return{"data": new_post}
+
+# Get one post with id
+@app.get("/sqlalchemy/{id}")
+def get_post(id: int, db: Session= Depends(get_db)):
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with id: {id} was not found")
+    return {"post_details": post}
+
+
+# Delete a post
+@app.delete("/sqlalchemy/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int, db: Session = Depends(get_db)):
+
+    post = db.query(models.Post).filter(models.Post.id == id)
+
+    if post.first() == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
+
+    post.delete(synchronize_session=False)
+    db.commit()
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+# Update a post
+@app.put("/sqlalchemy/{id}", status_code=status.HTTP_201_CREATED)
+def update_post(id: int, update_post: Createpostschema,  db: Session = Depends(get_db)):
+
+    post_query = db.query(models.Post).filter(models.Post.id == id)
+
+    post = post_query.first()
+
+    if post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
+
+    post_query.update(update_post.dict(), synchronize_session=False)
+    
+    db.commit()
+
+    return {"data": post_query.first()}
+
+# SqlAlchemy ends here
+
+
+
+
+
+
+# Using SQL to perform queries starts here
 
 # Get all Posts
 @app.get("/posts")
