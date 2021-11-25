@@ -12,7 +12,7 @@ import time
 from starlette.responses import Response
 from sqlalchemy.orm import Session
 from . import models
-from . database import engine, get_db
+from .database import engine, get_db
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -63,7 +63,8 @@ async def root():
 # SqlAlchemy test route
 @app.get("/sqlalchemy")
 async def get_sqlalchemy(db: Session = Depends(get_db)):
-    return {"message": db}
+    posts = db.query(models.Post).all()
+    return {"data": posts}
 
 
 # Get all Posts
