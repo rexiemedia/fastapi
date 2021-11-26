@@ -7,7 +7,9 @@ from .. database import get_db
 
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users"
+)
 
 
 # Users routes starts here
@@ -29,13 +31,13 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
 
 
 # Get all users
-@router.get("/users", response_model=List[schemas.UserOut])
+@router.get("/", response_model=List[schemas.UserOut])
 async def get_post(db: Session = Depends(get_db)):
     posts = db.query(models.User).all()
     return  posts
 
 # Get one user
-@router.get("/users/{id}", response_model=schemas.UserOut)
+@router.get("/{id}", response_model=schemas.UserOut)
 async def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
 
@@ -46,7 +48,7 @@ async def get_user(id: int, db: Session = Depends(get_db)):
 
 # delete a user
 # Delete a post
-@router.delete("/users/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(id: int, db: Session = Depends(get_db)):
 
     user = db.query(models.User).filter(models.User.id == id)
@@ -60,7 +62,7 @@ def delete_user(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 # Updating a user
-@router.put("/users/{id}", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+@router.put("/{id}", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def update_post(id: int, update_post: schemas.CreateUser,  db: Session = Depends(get_db)):
 
     user_query = db.query(models.User).filter(models.User.id == id)

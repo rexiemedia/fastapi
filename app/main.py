@@ -1,7 +1,4 @@
 from fastapi import FastAPI
-from typing import List
-from random import randrange
-from passlib.utils.decor import deprecated_function
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
