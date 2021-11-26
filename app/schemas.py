@@ -1,9 +1,7 @@
 # importing basemodel to create a schema for incoming data
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from pydantic.types import OptionalInt
 from datetime import datetime
-
 from app.models import User
 
 # Pydantic object schema defining the data to create a post
@@ -50,3 +48,14 @@ class UserOut(BaseModel):
     created_at: datetime
     class Config:
         orm_mode = True
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class Tokenout(BaseModel):
+    id: Optional[str] = None

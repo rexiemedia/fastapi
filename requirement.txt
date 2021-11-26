@@ -5,3 +5,4 @@ uvicorn main:app --reload
 #packaging
 uvicorn app.main:app --reload
 pip install sqlalchemy
+http://127.0.0.1:8000/docs

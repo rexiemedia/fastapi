@@ -8,14 +8,16 @@ from .. database import get_db
 
 
 router = APIRouter(
-    prefix="/users"
+    prefix="/users",
+    # to group endpoints together in the Swagger UI at http://127.0.0.1:8000/docs
+    tags=['Users']
 )
 
 
 # Users routes starts here
 
 # Create a User
-@router.post("/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
    
    hash_password = utils.hash(user.password)
@@ -32,7 +34,7 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
 
 # Get all users
 @router.get("/", response_model=List[schemas.UserOut])
-async def get_post(db: Session = Depends(get_db)):
+async def get_user(db: Session = Depends(get_db)):
     posts = db.query(models.User).all()
     return  posts
 
@@ -63,7 +65,7 @@ def delete_user(id: int, db: Session = Depends(get_db)):
 
 # Updating a user
 @router.put("/{id}", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
-def update_post(id: int, update_post: schemas.CreateUser,  db: Session = Depends(get_db)):
+def update_user(id: int, update_post: schemas.CreateUser,  db: Session = Depends(get_db)):
 
     user_query = db.query(models.User).filter(models.User.id == id)
 
