@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from typing import List
 from starlette.responses import Response
 from sqlalchemy.orm import Session
-from .. import models, schemas
+from .. import models, schemas, oauth2
 from .. database import get_db
 
 router = APIRouter(
@@ -21,7 +21,10 @@ async def get_post(db: Session = Depends(get_db)):
 
 # Create a post
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
-def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
+def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+    
+   print(user_id)
+   
 # **post.dict() will unpack the model instead of doing post.title
    new_post =  models.Post(**post.dict())
 
@@ -42,7 +45,7 @@ def get_post(id: int, db: Session= Depends(get_db)):
 
 # Delete a post
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db)):
+def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
 
     post = db.query(models.Post).filter(models.Post.id == id)
 
@@ -56,7 +59,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 # Update a post
 @router.put("/{id}", status_code=status.HTTP_201_CREATED)
-def update_post(id: int, update_post: schemas.PostCreate,  db: Session = Depends(get_db)):
+def update_post(id: int, update_post: schemas.PostCreate,  db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
 

@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 from typing import List
 from starlette.responses import Response
 from sqlalchemy.orm import Session
-from .. import models, schemas, utils
+from .. import models, schemas, utils, oauth2
 from .. database import get_db
 
 
@@ -34,7 +34,7 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
 
 # Get all users
 @router.get("/", response_model=List[schemas.UserOut])
-async def get_user(db: Session = Depends(get_db)):
+async def get_user(db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
     posts = db.query(models.User).all()
     return  posts
 
