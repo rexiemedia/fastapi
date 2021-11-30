@@ -22,4 +22,5 @@ class User(Base):
     password =  Column(String, nullable=False)
     firstname = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
+    isAdmin = Column(Boolean, server_default='FALSE', nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))

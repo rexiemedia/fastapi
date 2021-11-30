@@ -22,11 +22,9 @@ async def get_post(db: Session = Depends(get_db)):
 # Create a post
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
-    
-   print(user_id)
-   
+
 # **post.dict() will unpack the model instead of doing post.title
-   new_post =  models.Post(**post.dict())
+   new_post =  models.Post(user_id = user_id.id, **post.dict())
 
    db.add(new_post)
    db.commit()
@@ -47,12 +45,17 @@ def get_post(id: int, db: Session= Depends(get_db)):
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
 
-    post = db.query(models.Post).filter(models.Post.id == id)
+    post_q = db.query(models.Post).filter(models.Post.id == id)
+    
+    post = post_q.first()
 
-    if post.first() == None:
+    if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
 
-    post.delete(synchronize_session=False)
+    if post.user_id != int(user_id.id):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Unathorized Operation")
+    
+    post_q.delete(synchronize_session=False)
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -65,9 +68,13 @@ def update_post(id: int, update_post: schemas.PostCreate,  db: Session = Depends
 
     post = post_query.first()
 
+
     if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
 
+    if post.user_id != int(user_id.id):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Unathorized Operation")
+    
     post_query.update(update_post.dict(), synchronize_session=False)
     
     db.commit()

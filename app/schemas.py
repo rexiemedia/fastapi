@@ -10,7 +10,7 @@ class PostBase(BaseModel):
     content: str
     published: bool = True
     rating: Optional[int] = None
-    # created_by: str
+    
 
 # Inheriting Postbase properties
 class PostCreate(PostBase):
@@ -18,17 +18,18 @@ class PostCreate(PostBase):
 
 # Return specific values including inherited from PostBase
 class Post(PostBase):
-    id: int
+    id: int 
     created_at: datetime
-
+    user_id: int
+   
     class Config:
         orm_mode = True
 
 # Return specific values only
 class PostId(BaseModel):
     id: int
+    user_id: int
     created_at: datetime
-
     class Config:
         orm_mode = True
 
@@ -38,6 +39,8 @@ class CreateUser(BaseModel):
     password:  str
     firstname: str
     lastname: str
+    class Config:
+        orm_mode = True
 
 # Return specific values only
 class UserOut(BaseModel):
@@ -46,6 +49,8 @@ class UserOut(BaseModel):
     firstname: str
     lastname: str
     created_at: datetime
+    class Config:
+        orm_mode = True
 
 class UserLogin(BaseModel):
     email: EmailStr

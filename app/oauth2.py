@@ -52,7 +52,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     return verify_access_token(token, credential_exception)
 
 # get user full object for role base validation
-def get_user_object(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
+def get_admin(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                           detail=f"Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
@@ -60,4 +60,7 @@ def get_user_object(token: str = Depends(oauth2_scheme), db: Session = Depends(d
 
     user = db.query(models.User).filter(models.User.id == token.id).first()
 
+    if user.isAdmin != True:
+        credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                          detail=f"Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     return user

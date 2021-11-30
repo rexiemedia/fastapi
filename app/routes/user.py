@@ -34,38 +34,54 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
 
 # Get all users
 @router.get("/", response_model=List[schemas.UserOut])
-async def get_user(db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
-    posts = db.query(models.User).all()
-    return  posts
+async def get_user(db: Session = Depends(get_db), user_role: str = Depends(oauth2.get_admin)):
+    users = db.query(models.User).all()
+
+    if user_role.isAdmin != True :
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Unauthorized Operation Activity will be logged to administratior!")
+    
+
+    return  users
 
 # Get one user
 @router.get("/{id}", response_model=schemas.UserOut)
-async def get_user(id: int, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == id).first()
+async def get_user(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), admin_user: str = Depends(oauth2.get_admin)):
+    user_querry = db.query(models.User).filter(models.User.id == id)
 
-    if not user:
+    user = user_querry.first()
+
+
+    if user == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id: {id} does not exist!")
 
+    if user.id != int(current_user.id) and admin_user.isAdmin != True:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Unauthorized Operation Activity will be logged to administratior!")
+    
     return  user
 
 # delete a user
 # Delete a post
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(id: int, db: Session = Depends(get_db)):
+def delete_user(id: int, db: Session = Depends(get_db), admin_user: str = Depends(oauth2.get_admin), current_user: int = Depends(oauth2.get_current_user)):
 
-    user = db.query(models.User).filter(models.User.id == id)
+    user_querry = db.query(models.User).filter(models.User.id == id)
 
-    if user.first() == None:
+    user = user_querry.first()
+
+    if user == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with the ID: {id} does not exist")
 
-    user.delete(synchronize_session=False)
+    if user.id != int(current_user.id) and admin_user.isAdmin != True:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Unauthorized Operation Activity will be logged to administratior!")
+
+    user_querry.delete(synchronize_session=False)
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 # Updating a user
 @router.put("/{id}", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
-def update_user(id: int, update_post: schemas.CreateUser,  db: Session = Depends(get_db)):
+def update_user(id: int, update_post: schemas.CreateUser,  db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), admin_user: str = Depends(oauth2.get_admin)):
 
     user_query = db.query(models.User).filter(models.User.id == id)
 
@@ -73,6 +89,9 @@ def update_user(id: int, update_post: schemas.CreateUser,  db: Session = Depends
 
     if user == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
+
+    if user.id != int(current_user.id) and admin_user.isAdmin != True:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Unauthorized Operation Activity will be logged to administratior!")
 
     hash_password = utils.hash(user.password)
     user.password = hash_password
