@@ -81,7 +81,7 @@ def delete_user(id: int, db: Session = Depends(get_db), admin_user: str = Depend
 
 # Updating a user
 @router.put("/{id}", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
-def update_user(id: int, update_post: schemas.CreateUser,  db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), admin_user: str = Depends(oauth2.get_admin)):
+def update_user(id: int, updated_user: schemas.CreateUser,  db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user), admin_user: str = Depends(oauth2.get_admin)):
 
     user_query = db.query(models.User).filter(models.User.id == id)
 
@@ -93,9 +93,10 @@ def update_user(id: int, update_post: schemas.CreateUser,  db: Session = Depends
     if user.id != int(current_user.id) and admin_user.isAdmin != True:
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Unauthorized Operation Activity will be logged to administratior!")
 
-    hash_password = utils.hash(user.password)
+    
+    hash_password = utils.hash(updated_user.password)
     user.password = hash_password
-    user_query.update(update_post.dict(), synchronize_session=False)
+    user_query.update(updated_user.dict(), synchronize_session=False)
     
     db.commit()
 

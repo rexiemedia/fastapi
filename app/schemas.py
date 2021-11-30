@@ -16,11 +16,22 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     pass
 
+# Return specific values only
+class UserOut(BaseModel):
+    id: int
+    email: str
+    firstname: str
+    lastname: str
+    created_at: datetime
+    class Config:
+        orm_mode = True
+        
 # Return specific values including inherited from PostBase
 class Post(PostBase):
     id: int 
     created_at: datetime
     user_id: int
+    owner: UserOut
    
     class Config:
         orm_mode = True
@@ -42,15 +53,6 @@ class CreateUser(BaseModel):
     class Config:
         orm_mode = True
 
-# Return specific values only
-class UserOut(BaseModel):
-    id: int
-    email: str
-    firstname: str
-    lastname: str
-    created_at: datetime
-    class Config:
-        orm_mode = True
 
 class UserLogin(BaseModel):
     email: EmailStr

@@ -43,7 +43,7 @@ def get_post(id: int, db: Session= Depends(get_db)):
 
 # Delete a post
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user), super_user: str = Depends(oauth2.get_admin)):
 
     post_q = db.query(models.Post).filter(models.Post.id == id)
     
@@ -52,7 +52,7 @@ def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(o
     if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
 
-    if post.user_id != int(user_id.id):
+    if post.user_id != int(user_id.id) and super_user.isAdmin != True:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Unathorized Operation")
     
     post_q.delete(synchronize_session=False)

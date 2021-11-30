@@ -15,6 +15,8 @@ class Post(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
+    owner = relationship("User")
+    
 class User(Base):
     __tablename__ =  "users"
     id = Column(Integer, primary_key=True, nullable=False)
