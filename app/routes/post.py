@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
-from typing import List
+from typing import List, Optional
 from starlette.responses import Response
 from sqlalchemy.orm import Session
 from .. import models, schemas, oauth2
@@ -14,8 +14,9 @@ router = APIRouter(
 # Using SqlAlchemy to perfom queries
 
 @router.get("/", response_model=List[schemas.Post])
-async def get_post(db: Session = Depends(get_db)):
-    posts = db.query(models.Post).all()
+async def get_post(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
+    
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return  posts
 
 
