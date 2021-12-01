@@ -11,9 +11,3 @@ def hash(password: str):
 
 def authenticate(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
-
-def verify_user(isNotadmin):
-    pass
-
-def verify_admin(isAdmin):
-    pass

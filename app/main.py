@@ -1,46 +1,23 @@
 from fastapi import FastAPI
-import psycopg2
-from psycopg2.extras import RealDictCursor
-import time
+# import psycopg2
+# from psycopg2.extras import RealDictCursor
+# import time
 from starlette.responses import RedirectResponse
 from . import models
 from .database import engine
-from .routes import post, user, auth
+from .routes import post, user, auth, vote
+
+# from app import database
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# Using SQL queries
-try:
-    conn = psycopg2.connect(host='localhost', database='fastapis', user='postgres', password='!Alphaeagle123', cursor_factory=RealDictCursor)
-    cursor = conn.cursor()
-    if cursor.closed == True:
-        pass
-    else:
-        cursor = conn.cursor()
-        time.sleep(2)
-    print("connection successful")
-except Exception as error:
-    print("error connect")
-    print("Error:", error)
-   
-
-all_posts = []
-
-def find_post(id):
-    for p in all_posts:
-        if p["id"] == id:
-            return p
-
-def find_post_index(id):
-    for i, p in enumerate(all_posts):
-        if p['id'] == id:
-            return i
 
 app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(auth.router)
+app.include_router(vote.router)
 
 @app.get("/")
 async def root():
@@ -50,6 +27,32 @@ async def root():
 
 
 # # Using SQL to perform queries starts here
+# Using SQL queries
+# try:
+#     conn = psycopg2.connect(host='localhost', database='fastapis', user='postgres', password='!Alphaeagle123', cursor_factory=RealDictCursor)
+#     cursor = conn.cursor()
+#     if cursor.closed == True:
+#         pass
+#     else:
+#         cursor = conn.cursor()
+#         time.sleep(2)
+#     print("connection successful")
+# except Exception as error:
+#     print("error connect")
+#     print("Error:", error)
+   
+
+# all_posts = []
+
+# def find_post(id):
+#     for p in all_posts:
+#         if p["id"] == id:
+#             return p
+
+# def find_post_index(id):
+#     for i, p in enumerate(all_posts):
+#         if p['id'] == id:
+#             return i
 
 # # Get all Posts
 # @app.get("/posts")

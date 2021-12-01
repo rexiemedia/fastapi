@@ -1,8 +1,8 @@
 # importing basemodel to create a schema for incoming data
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
-from pydantic.types import conint
+# from pydantic.types import conint
 
 # Pydantic object schema defining the data to create a post
 class PostBase(BaseModel):
@@ -65,10 +65,9 @@ class TokenData(BaseModel):
     id: Optional[str] = None
 
 
-class Vote(BaseModel):
-    post_id: int
-    dir: conint(le=1)
-
 class Tokenout(BaseModel):
     id: Optional[str] = None
-    
+
+class Vote(BaseModel):
+    post_id: int
+    dir: int = Field(..., gt=-1, lt=2)
