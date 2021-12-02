@@ -6,3 +6,36 @@ uvicorn main:app --reload
 uvicorn app.main:app --reload
 pip install sqlalchemy
 http://127.0.0.1:8000/docs
+
+alembic revision -m "add content to  posts table"
+alembic upgrade revision_number
+alembic downgrade -1 or down_revision
+
+
+For nginx double slash
+
+merge_slashes off;
+rewrite (.*)//+(.*) $1 $2 permanent
+
+if ($request_uri ~ "^[^?]*?//") {
+    rewrite "^" $scheme://$host$uri permanent;
+}
+
+if ($request_uri ~* "//") {
+    rewrite ^/(.*) $scheme://$host$uri permanent;
+}
+
+# unless a direct file request, ensure URL ends with forward slash
+if ($uri !~ "\.[a-z0-9]{2,4}$") {
+	rewrite "[^/]$" $scheme://$host$uri/ permanent;
+}
+
+location ~ "\.htaccess$" {
+	return 404;
+}
+
+# deny access to any Git repository related files/directories
+# useful if using "git push" is part of your web application deployments
+location ~ "\.git(?:$|/|attributes$|ignore$|modules$)" {
+	return 404;
+}

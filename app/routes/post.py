@@ -1,5 +1,6 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
 from typing import List, Optional
+from sqlalchemy.sql.functions import func
 from starlette.responses import Response
 from sqlalchemy.orm import Session
 from .. import models, schemas, oauth2
@@ -13,11 +14,26 @@ router = APIRouter(
 
 # Using SqlAlchemy to perfom queries
 
-@router.get("/", response_model=List[schemas.Post])
+@router.get("/", response_model=List[schemas.PostOut])
 async def get_post(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: Optional[str] = ""):
     
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
-    return  posts
+    # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    new_view = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    return new_view
+
+
+# Get one post with id
+@router.get("/{id}", response_model=schemas.PostOut)
+def get_post(id: int, db: Session= Depends(get_db)):
+    # post = db.query(models.Post).filter(models.Post.id == id).first()
+
+    new_view = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
+
+    if not new_view:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with id: {id} was not found")
+    return new_view 
 
 
 # Create a post
@@ -31,15 +47,6 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), user_i
    db.commit()
    db.refresh(new_post)
    return new_post
-
-# Get one post with id
-@router.get("/{id}", response_model=schemas.PostId)
-def get_post(id: int, db: Session= Depends(get_db)):
-    post = db.query(models.Post).filter(models.Post.id == id).first()
-
-    if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with id: {id} was not found")
-    return post
 
 
 # Delete a post

@@ -35,11 +35,11 @@ class Post(PostBase):
     class Config:
         orm_mode = True
 
-# Return specific values only
-class PostId(BaseModel):
-    id: int
-    created_at: datetime
-    owner: UserOut
+# Returns a joined Post and votes
+class PostOut(BaseModel):
+    Post: Post
+    votes: int
+
     class Config:
         orm_mode = True
 
