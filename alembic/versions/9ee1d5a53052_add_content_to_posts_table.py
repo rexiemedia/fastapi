@@ -20,7 +20,7 @@ def upgrade():
     op.create_table('posts', sa.Column('id', sa.Integer(), nullable=False,
                     primary_key=True), sa.Column('title', sa.String(), nullable=False), sa.Column('content', sa.String(), nullable=False),
                     sa.Column('published', sa.Boolean(), server_default=sa.schema.DefaultClause('True'), nullable=False), 
-                    sa.Column('rating', sa.Integer(),server_default=sa.schema.DefaultClause(0), nullable=False),
+                    sa.Column('rating', sa.Integer(),server_default=sa.schema.DefaultClause('0'), nullable=False),
                     sa.Column('created_at', sa.TIMESTAMP(timezone=True),
                               server_default=sa.text('now()'), nullable=False)
                     )
