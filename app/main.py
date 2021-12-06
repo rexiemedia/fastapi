@@ -17,11 +17,18 @@ from .routes import post, user, auth, vote
 app = FastAPI()
 
 origins = [
+<<<<<<< HEAD
     # "https://youtube.com",
     # "https://www.google.com",
     # "http://localhost",
     # "http://localhost:8000",
     "*"
+=======
+    "https://youtube.com",
+    "https://www.google.com",
+    "http://localhost",
+    "http://localhost:8000",
+>>>>>>> main
 ]
 
 app.add_middleware(

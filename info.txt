@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 "email": "user1@rexiemedia.com",
 "password": "ovie123"
 
 
+=======
+>>>>>>> main
 py -3 -m venv venv
 venv\Scripts\activate.bat
 pip install fastapi[all]
