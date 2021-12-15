@@ -12,9 +12,6 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int
 
     class Config:
-        env_prefix = ""
-        case_sentive = False
-        env_file = '.env'
         env_file = ".env"
 
 

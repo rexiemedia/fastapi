@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # from psycopg2.extras import RealDictCursor
 # import time
 from starlette.responses import RedirectResponse
-from . import models
+# from . import models
 from .database import engine
 from .routes import post, user, auth, vote
 
@@ -38,10 +38,11 @@ app.include_router(auth.router)
 app.include_router(vote.router)
 
 @app.get("/")
-
 async def root():
-    response = RedirectResponse(url='/posts')
-    return response
+    return {"message": "Hello World from Rexiemedia!!"}
+
+#     response = RedirectResponse(url='/posts')
+#     return response
 
 
 
