@@ -15,7 +15,6 @@ config = context.config
 # Overide the defaul alembic.ini 
 config.set_main_option("sqlalchemy.url", f'postgresql+psycopg2://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}')
 
-
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
@@ -30,7 +29,6 @@ target_metadata = Base
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -55,7 +53,6 @@ def run_migrations_offline():
     with context.begin_transaction():
         context.run_migrations()
 
-
 def run_migrations_online():
     """Run migrations in 'online' mode.
 
@@ -77,8 +74,9 @@ def run_migrations_online():
         with context.begin_transaction():
             context.run_migrations()
 
-
 if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
+
+

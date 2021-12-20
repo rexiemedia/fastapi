@@ -1,8 +1,8 @@
 """votes
 
-Revision ID: 1c1ea4541a94
-Revises: 8bb4737925ec
-Create Date: 2021-12-15 11:34:19.041592
+Revision ID: 78c195cb5b2c
+Revises: ef7853dc3fc1
+Create Date: 2021-12-15 13:43:07.779821
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1c1ea4541a94'
-down_revision = '8bb4737925ec'
+revision = '78c195cb5b2c'
+down_revision = 'ef7853dc3fc1'
 branch_labels = None
 depends_on = None
 

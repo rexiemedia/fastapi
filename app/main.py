@@ -39,7 +39,7 @@ app.include_router(vote.router)
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World from Rexiemedia!!"}
+    return {"message": "Hello World from Rexiemedia!!!"}
 
 #     response = RedirectResponse(url='/posts')
 #     return response

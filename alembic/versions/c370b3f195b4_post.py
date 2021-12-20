@@ -1,8 +1,8 @@
-"""posts1
+"""post
 
-Revision ID: 3d421a6812c9
+Revision ID: c370b3f195b4
 Revises: 
-Create Date: 2021-12-15 11:22:35.630370
+Create Date: 2021-12-15 13:39:49.498416
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3d421a6812c9'
+revision = 'c370b3f195b4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -32,3 +32,4 @@ def upgrade():
 def downgrade():   
     op.drop_table('posts')
     pass
+

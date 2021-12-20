@@ -60,7 +60,7 @@ def get_admin(token: str = Depends(oauth2_scheme), db: Session = Depends(databas
 
     user = db.query(models.User).filter(models.User.id == token.id).first()
 
-    if user.isAdmin != True:
+    if user.email != 'admin':
         credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                           detail=f"Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
     return user

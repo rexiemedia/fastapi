@@ -60,7 +60,7 @@ def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(o
     if post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
 
-    if post.user_id != int(user_id.id) and super_user.isAdmin != True:
+    if post.user_id != int(user_id.id) and super_user.email != 'admin':
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Unathorized Operation")
     
     post_q.delete(synchronize_session=False)

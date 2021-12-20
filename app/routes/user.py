@@ -37,7 +37,7 @@ def create_user(user: schemas.CreateUser, db: Session = Depends(get_db)):
 async def get_user(db: Session = Depends(get_db), user_role: str = Depends(oauth2.get_admin)):
     users = db.query(models.User).all()
 
-    if user_role.isAdmin != True :
+    if user_role.email != 'admin' :
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Unauthorized Operation Activity will be logged to administratior!")
     
 
@@ -54,7 +54,7 @@ async def get_user(id: int, db: Session = Depends(get_db), current_user: int = D
     if user == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id: {id} does not exist!")
 
-    if user.id != int(current_user.id) and admin_user.isAdmin != True:
+    if user.id != int(current_user.id) and admin_user.email != 'admin':
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Unauthorized Operation Activity will be logged to administratior!")
     
     return  user
@@ -71,7 +71,7 @@ def delete_user(id: int, db: Session = Depends(get_db), admin_user: str = Depend
     if user == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with the ID: {id} does not exist")
 
-    if user.id != int(current_user.id) and admin_user.isAdmin != True:
+    if user.id != int(current_user.id) and admin_user.email != 'admin':
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Unauthorized Operation Activity will be logged to administratior!")
 
     user_querry.delete(synchronize_session=False)
@@ -90,7 +90,7 @@ def update_user(id: int, updated_user: schemas.CreateUser,  db: Session = Depend
     if user == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
 
-    if user.id != int(current_user.id) and admin_user.isAdmin != True:
+    if user.id != int(current_user.id) and admin_user.email != 'admin':
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=f"Unauthorized Operation Activity will be logged to administratior!")
 
     
