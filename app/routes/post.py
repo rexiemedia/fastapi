@@ -69,7 +69,7 @@ def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(o
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 # Update a post
-@router.put("/{id}", status_code=status.HTTP_201_CREATED)
+@router.put("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_post(id: int, update_post: schemas.PostCreate,  db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
@@ -81,7 +81,7 @@ def update_post(id: int, update_post: schemas.PostCreate,  db: Session = Depends
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Post with the ID: {id} does not exist")
 
     if post.user_id != int(user_id.id):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Unathorized Operation")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Unathorized Operation")
     
     post_query.update(update_post.dict(), synchronize_session=False)
     

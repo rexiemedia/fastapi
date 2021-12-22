@@ -1,21 +1,8 @@
-import json
 import pytest
 from app import schemas
-from .database import client, session
+# from .database import client, session
 from app.config import settings
 from jose import jwt
-
-@pytest.fixture
-def test_user(client):
-    user_data = {"email": "hello123@gmail.com", "password": "password123", "firstname": "anyname",
-    "lastname": "anylastname"}
-    res = client.post("/users/", json=user_data)
-
-    assert res.status_code == 201
-    new_user = res.json()
-    new_user['password'] = user_data['password']
-    return new_user
-
 
 
 def test_root(client):
@@ -24,7 +11,7 @@ def test_root(client):
     assert response.json() == {"message": "Hello World from Rexiemedia!!!"}
 
 
-def test_create_user(client, session):
+def test_create_user(client):
     res = client.post(
         "/users/", json={"email": "hello123@gmail.com", "password": "password123", "firstname": "anyname",
     "lastname": "anylastname"})
