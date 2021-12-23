@@ -70,3 +70,4 @@ def test_authorized_user_get(authorized_client, test_user):
     assert user_data.email == "hello123@gmail.com"
     assert user_data.firstname == "anyname"
     assert res.status_code == 200
+    
