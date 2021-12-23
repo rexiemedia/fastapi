@@ -5,7 +5,7 @@ from starlette.responses import Response
 from sqlalchemy.orm import Session
 from .. import models, schemas, oauth2
 from .. database import get_db
-from app import database
+# from app import database
 
 router = APIRouter(
     prefix="/vote",
@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def vote(vote: schemas.Vote, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
+def vote(vote: schemas.Vote, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
 
     post = db.query(models.Post).filter(models.Post.id == vote.post_id).first()
     if not post:
@@ -26,7 +26,7 @@ def vote(vote: schemas.Vote, db: Session = Depends(database.get_db), current_use
 
     
     if (vote.dir == 1):
-        print(post.owner.id, '==', current_user.id)
+
         if(int(post.owner.id) == int(current_user.id)):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Users can not vote on their own post")
         new_vote = models.Vote(post_id = vote.post_id, user_id = current_user.id)
@@ -47,4 +47,4 @@ def vote(vote: schemas.Vote, db: Session = Depends(database.get_db), current_use
         vote_query.delete(synchronize_session=False)
         db.commit()
 
-        return {"message": "vote is successfully removed "}
+        return {"message": "vote is successfully removed"}

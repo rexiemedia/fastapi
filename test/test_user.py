@@ -1,5 +1,6 @@
 import pytest
 from app import schemas
+from typing import List
 # from .database import client, session
 from app.config import settings
 from jose import jwt
@@ -48,3 +49,24 @@ def test_incorrect_login(test_user, client, email, password, status_code):
 
     assert res.status_code == status_code
     # assert res.json().get('detail') == 'Invalid Credentials'
+    
+
+# if the route is restricted will return 401
+def test_unaothorized_user_get_all_users(client):
+    res = client.get(f"/users/")
+    assert res.status_code == 401
+
+# if the route is restricted will return 401
+def test_unaothorized_user_get_one_users(client):
+    res = client.get(f"/users/{1}")
+    assert res.status_code == 401
+
+
+def test_authorized_user_get(authorized_client, test_user):
+    res = authorized_client.get(f"/users/{test_user['id']}")
+    
+    user_data = schemas.UserOut(**res.json())
+    
+    assert user_data.email == "hello123@gmail.com"
+    assert user_data.firstname == "anyname"
+    assert res.status_code == 200
