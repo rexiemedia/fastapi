@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+import requests
 import json
 import pytest
 from sqlalchemy import create_engine
